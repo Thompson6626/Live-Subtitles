@@ -8,7 +8,7 @@ class AdvancedOptionsPage(QWidget):
         self.stacked_widget = stacked_widget
 
         self.language = QLineEdit()  # Language code (optional)
-        self.language.placeholderText("en")
+        self.language.setPlaceholderText("en")
         self.language.setToolTip("Specify the language code for transcription (e.g., 'en' for English, 'es' for Spanish). Leave empty for auto-detection.")
 
         self.task = QComboBox()  # Task selection (transcribe/translate)

@@ -1,6 +1,6 @@
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QWidget, QStackedWidget, QLabel, QComboBox, QHBoxLayout, QPushButton, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QStackedWidget, QLabel, QComboBox, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit
 
 # Faster-Whisper Models
 # https://huggingface.co/Systran
@@ -20,6 +20,8 @@ WHISPER_MODELS = [
 class FrontPage(QWidget):
     """Main page with model selection and start button."""
 
+    selected_model = pyqtSignal(str)
+
     def __init__(self, stacked_widget: QStackedWidget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -28,6 +30,20 @@ class FrontPage(QWidget):
         self.label = QLabel("Whisper Model:")
         self.label.setFont(QFont("Arial", 16))
         self.label.setStyleSheet("color: white; margin-right: 1.5em; margin-left: 1.5em;")
+
+        # Language Selection
+        self.language_selection = QLineEdit()
+        self.language_selection.setPlaceholderText("en")
+        self.language_selection.setFont(QFont("Arial", 16))
+        self.language_selection.setStyleSheet("""
+        QLineEdit {
+            border: none;
+        }
+        QLineEdit:focus{
+            border: 1px solid white;
+        }
+        """)
+
         # ComboBox
         self.combo_box = QComboBox()
         self.combo_box.addItems(WHISPER_MODELS)
@@ -68,6 +84,7 @@ class FrontPage(QWidget):
         # Main layout
         layout = QVBoxLayout()
         layout.addLayout(model_selection_layout)
+        layout.addWidget(self.language_selection, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.listen_button, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.setContentsMargins(20, 20, 20, 20)
         self.setLayout(layout)
@@ -75,7 +92,13 @@ class FrontPage(QWidget):
 
     def switch_to_listening(self):
         """Start audio transcription and switch to listening page."""
-        listening_page = self.stacked_widget.widget(1)
+        listening_page = self.stacked_widget.widget(2) # Listening Page
         selected_model = self.combo_box.currentText()
-        listening_page.start_listening(selected_model)
-        self.stacked_widget.setCurrentIndex(1)
+        input_language = self.language_selection.text() or None
+
+        listening_page.start_listening(
+            selected_model,
+            language=input_language
+        )
+
+        self.stacked_widget.setCurrentIndex(2)

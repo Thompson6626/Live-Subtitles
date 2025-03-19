@@ -2,7 +2,7 @@ from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QWidget, QStackedWidget, QLabel, QPushButton, QVBoxLayout
 
-from pages.transcription import AudioStreamer
+from .transcription import AudioStreamer
 
 
 class ListeningPage(QWidget):
@@ -15,7 +15,7 @@ class ListeningPage(QWidget):
         self.audio_thread = None
 
         # Label for transcribed text
-        self.listening_label = QLabel("Listening...")
+        self.listening_label = QLabel("")
         self.listening_label.setFont(QFont("Arial", 16))
         self.listening_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.listening_label.setWordWrap(True)
@@ -35,10 +35,10 @@ class ListeningPage(QWidget):
         self.setLayout(layout)
         self.setStyleSheet("background-color: #222;")
 
-    def start_listening(self, model_name: str):
+    def start_listening(self, selected_model: str, **settings):
         """Start audio transcription thread."""
         if self.audio_thread is None or not self.audio_thread.isRunning():
-            self.audio_thread = AudioStreamer(model_name)
+            self.audio_thread = AudioStreamer(selected_model, **settings)
             self.audio_thread.new_text_signal.connect(self.add_text)
             self.audio_thread.start()
 
