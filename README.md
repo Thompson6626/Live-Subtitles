@@ -35,6 +35,9 @@ Run the application:
 ```sh
 python main.py
 ```
+You should see:
+
+![App Showcase](assets/Showcase.png)
 
 ## 📁 Project Structure
 ```
