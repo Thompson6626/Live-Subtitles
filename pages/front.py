@@ -31,10 +31,15 @@ class FrontPage(QWidget):
         self.label.setFont(QFont("Arial", 16))
         self.label.setStyleSheet("color: white; margin-right: 1.5em; margin-left: 1.5em;")
 
+        # Language selection label
+        self.language_selection_label = QLabel("Language code:")
+        self.language_selection_label.setFont(QFont("Arial", 13))
+        self.language_selection_label.setStyleSheet("color: white; margin-right: 1.5em; margin-left: 1.5em;")
+
         # Language Selection
         self.language_selection = QLineEdit()
         self.language_selection.setPlaceholderText("en")
-        self.language_selection.setFont(QFont("Arial", 16))
+        self.language_selection.setFont(QFont("Arial", 13))
         self.language_selection.setStyleSheet("""
         QLineEdit {
             border: none;
@@ -43,6 +48,11 @@ class FrontPage(QWidget):
             border: 1px solid white;
         }
         """)
+        language_input_layout = QHBoxLayout()
+        language_input_layout.addWidget(self.language_selection_label)
+        language_input_layout.addWidget(self.language_selection)
+        language_input_layout.addStretch()
+        language_input_layout.setContentsMargins(50, 30, 0, 0)  # (left, top, right, bottom)
 
         # ComboBox
         self.combo_box = QComboBox()
@@ -84,7 +94,7 @@ class FrontPage(QWidget):
         # Main layout
         layout = QVBoxLayout()
         layout.addLayout(model_selection_layout)
-        layout.addWidget(self.language_selection, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addLayout(language_input_layout)
         layout.addWidget(self.listen_button, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.setContentsMargins(20, 20, 20, 20)
         self.setLayout(layout)
