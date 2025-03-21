@@ -1,6 +1,4 @@
-pyaudio
 numpy
 faster-whisper
 soundcard
-sounddevice
 PyQt6

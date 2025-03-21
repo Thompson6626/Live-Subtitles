@@ -1,15 +1,13 @@
 import numpy as np
 import soundcard as sc
-import sounddevice as sd
 from faster_whisper import WhisperModel
 from PyQt6.QtCore import QThread, pyqtSignal, QThreadPool, QRunnable
 
 SAMPLE_RATE = 16000  # Faster Whisper expects 16 kHz
-CHUNK_SEC = 1  # Reduce latency (1-second chunks)
-BUFFER_LIMIT = 5  # Store 5 chunks before processing
+CHUNK_SEC = 2  # Reduce latency (1-second chunks)
 MODEL_CACHE = {}  # Cache for loaded models
 
-def get_whisper_model(model_name: str):
+def get_whisper_model(model_name: str = "medium"):
     """Load the Faster Whisper model and cache it to avoid reloading."""
     if model_name not in MODEL_CACHE:
         MODEL_CACHE[model_name] = WhisperModel(model_name, device="cuda", compute_type="float16")
@@ -29,27 +27,25 @@ class TranscriptionTask(QRunnable):
 
     def run(self):
         """Process and transcribe the audio chunk immediately."""
+        try:
+            segments, _ = self.model.transcribe(
+                self.chunk,
+                language=self.language,
+                task=self.task,
+                without_timestamps=True,
+                beam_size=5,
+                best_of=5,
+                temperature=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
+                multilingual=self.multilingual,
+                word_timestamps=False
+            )
 
-        # If language not given ,it will be guessed on the first 30 seconds
+            text = " ".join(segment.text.strip() for segment in segments if segment.text)
+            if text:
+                self.signal.emit(text)
 
-        segments, _ = self.model.transcribe(
-            self.chunk,
-            language=self.language,
-            task=self.task,
-            without_timestamps=True,
-            beam_size=5,
-            best_of=5,
-            temperature=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
-            vad_filter=True,
-            multilingual=self.multilingual,
-            log_progress=False,
-            word_timestamps=False,
-            condition_on_previous_text=True
-        )
-
-        text = " ".join(segment.text.strip() for segment in segments if segment.text)
-        if text:
-            self.signal.emit(text)
+        except Exception as e:
+            print(f"Error in transcription: {e}")
 
 class AudioStreamer(QThread):
     """Threaded audio recording and transcription."""
@@ -57,36 +53,31 @@ class AudioStreamer(QThread):
 
     def __init__(self, model_name: str = "medium", **settings):
         super().__init__()
-        self.model_name = model_name
-        self.model = get_whisper_model(self.model_name)  # Use cached model
+        self.model = get_whisper_model(model_name)  # Use cached model
         self.thread_pool = QThreadPool.globalInstance()
         self.running = True  # Flag for stopping the thread
         self.settings = settings
 
     def run(self):
         """Continuously capture and process system audio."""
-
         try:
-            with sc.get_microphone(
-                    id=str(
-                        sc.default_speaker().name
-                    ),
-                    include_loopback=True
-            ).recorder(
-                samplerate=SAMPLE_RATE
-            ) as mic:
-                while self.running:
-                    data = mic.record(numframes=int(SAMPLE_RATE * CHUNK_SEC))
+            mic = sc.get_microphone(
+                id=str(sc.default_speaker().name),
+                include_loopback=True
+            )
 
-                    if data.ndim > 1:  # Convert stereo to mono properly
-                        data = np.mean(data, axis=1, dtype=np.float32)
+            with mic.recorder(samplerate=SAMPLE_RATE) as recorder:
+                while self.running:
+                    data = recorder.record(numframes=int(SAMPLE_RATE * CHUNK_SEC))
+
+                    if data.ndim > 1:  # Convert stereo to mono
+                        data = np.mean(data, axis=1).astype(np.float32)
 
                     chunk = data.astype(np.float32)
 
-                    # Process transcription immediately instead of waiting
+                    # Process transcription immediately
                     task = TranscriptionTask(self.model, chunk, self.new_text_signal, **self.settings)
                     self.thread_pool.start(task)
-
 
         except Exception as e:
             print(f"Error in audio streaming: {e}")
@@ -94,17 +85,5 @@ class AudioStreamer(QThread):
     def stop(self):
         """Stop the audio recording and ensure resources are released."""
         self.running = False  # Stop the loop
-
-        # Close the microphone stream safely
-        if hasattr(self, "stream") and self.stream is not None:
-            self.stream.stop_stream()
-            self.stream.close()
-
-        # Wait for any remaining tasks to finish
-        if self.thread_pool:
-            self.thread_pool.waitForDone()
-
+        self.thread_pool.waitForDone()  # Wait for all tasks to finish
         print("Audio streaming stopped.")
-
-
-

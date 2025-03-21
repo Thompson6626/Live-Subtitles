@@ -64,8 +64,6 @@ class ListeningPage(QWidget):
         """Stop transcription and clean up."""
         if self.audio_thread:
             self.audio_thread.stop()
-            self.audio_thread.quit()
-            self.audio_thread.wait()  # Ensure it fully stops
             self.audio_thread = None
 
         self.text_fragments.clear()

@@ -1,6 +1,5 @@
 import sys
 
-import sounddevice
 from PyQt6.QtWidgets import QWidget, QStackedWidget, QApplication, QVBoxLayout
 
 from pages import FrontPage, ListeningPage, AdvancedOptionsPage
@@ -34,10 +33,8 @@ class MyApp(QWidget):
         self.setFixedSize(500, 300)
         self.setStyleSheet("background-color: #111; color: white;")
 
-import sounddevice as sd
 if __name__ == "__main__":
     app = QApplication([])
     window = MyApp()
     window.show()
-
     sys.exit(app.exec())
