@@ -70,6 +70,9 @@ class AudioStreamer(QThread):
                 while self.running:
                     data = recorder.record(numframes=int(SAMPLE_RATE * CHUNK_SEC))
 
+                    if not self.running:  # Check again to prevent extra processing
+                        break
+
                     if data.ndim > 1:  # Convert stereo to mono
                         data = np.mean(data, axis=1).astype(np.float32)
 
@@ -85,5 +88,7 @@ class AudioStreamer(QThread):
     def stop(self):
         """Stop the audio recording and ensure resources are released."""
         self.running = False  # Stop the loop
-        self.thread_pool.waitForDone()  # Wait for all tasks to finish
+        self.thread_pool.clear()  # Cancel pending tasks
+        self.quit()  # Request the thread to quit
+        self.wait()  # Wait for the thread to finish safely
         print("Audio streaming stopped.")
