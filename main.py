@@ -2,7 +2,8 @@ import sys
 
 from PyQt6.QtWidgets import QWidget, QStackedWidget, QApplication, QVBoxLayout
 
-from pages import FrontPage, ListeningPage, AdvancedOptionsPage
+from pages import FrontPage, ListeningPage , WhisperSettings , ListeningSettings
+
 
 class MyApp(QWidget):
     """Main application that manages page switching."""
@@ -15,13 +16,15 @@ class MyApp(QWidget):
 
         # Create pages
         self.main_page = FrontPage(self.stacked_widget)
+        self.whisper_settings_page = WhisperSettings(self.stacked_widget)
         self.listening_page = ListeningPage(self.stacked_widget)
-        self.advanced_options_page = AdvancedOptionsPage(self.stacked_widget)
+        self.listening_settings_page = ListeningSettings(self.stacked_widget)
 
         # Add pages to stacked widget
         self.stacked_widget.addWidget(self.main_page)
-        self.stacked_widget.addWidget(self.advanced_options_page)
+        self.stacked_widget.addWidget(self.whisper_settings_page)
         self.stacked_widget.addWidget(self.listening_page)
+        self.stacked_widget.addWidget(self.listening_settings_page)
 
         # Main layout
         layout = QVBoxLayout()

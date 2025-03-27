@@ -23,7 +23,14 @@ class TranscriptionTask(QRunnable):
 
         self.language = settings.get("language", None)
         self.task = settings.get("task", "transcribe")
-        self.multilingual = settings.get("multilingual", False)
+        self.beam_size = settings.get("beam_size", 5)
+        self.temperature = settings.get("temperature", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]) # map string to array
+
+        if isinstance(self.temperature, str):
+            # Parsing "0.0, 0.2, 0.4, 0.6, 0.8, 1.0" for example
+            self.temperature = [float(value.strip()) for value in self.temperature.split(",")]
+
+        self.supress_blank = settings.get("supress_blank", True)
 
     def run(self):
         """Process and transcribe the audio chunk immediately."""
@@ -32,12 +39,9 @@ class TranscriptionTask(QRunnable):
                 self.chunk,
                 language=self.language,
                 task=self.task,
-                without_timestamps=True,
-                beam_size=5,
-                best_of=5,
-                temperature=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
-                multilingual=self.multilingual,
-                word_timestamps=False
+                beam_size=self.beam_size,
+                temperature=self.temperature,
+                suppress_blank=self.supress_blank
             )
 
             text = " ".join(segment.text.strip() for segment in segments if segment.text)
@@ -70,7 +74,7 @@ class AudioStreamer(QThread):
                 while self.running:
                     data = recorder.record(numframes=int(SAMPLE_RATE * CHUNK_SEC))
 
-                    if not self.running:  # Check again to prevent extra processing
+                    if not self.running: # Double check
                         break
 
                     if data.ndim > 1:  # Convert stereo to mono

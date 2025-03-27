@@ -91,24 +91,55 @@ class FrontPage(QWidget):
         """)
         self.listen_button.clicked.connect(self.switch_to_listening)
 
+        # Advanced Options Button
+        self.advanced_options_button = QPushButton("Advanced Options")
+        self.advanced_options_button.setFont(QFont("Arial", 14))
+        self.advanced_options_button.setStyleSheet("""
+            QPushButton {
+                background-color: #444;
+                color: #F5F5F5;
+                padding: 10px;
+                border-radius: 8px;
+                font-weight: bold;
+                transition: background-color 0.5s;
+            }
+            QPushButton:hover {
+                background-color: #666;
+            }
+            QPushButton:pressed {
+                background-color: #555;
+            }
+        """)
+        self.advanced_options_button.clicked.connect(self.switch_to_whisper_options)
+
         # Main layout
         layout = QVBoxLayout()
         layout.addLayout(model_selection_layout)
         layout.addLayout(language_input_layout)
         layout.addWidget(self.listen_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.advanced_options_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
         layout.setContentsMargins(20, 20, 20, 20)
+
         self.setLayout(layout)
         self.setStyleSheet("background-color: #222;")
 
     def switch_to_listening(self):
         """Start audio transcription and switch to listening page."""
         listening_page = self.stacked_widget.widget(2) # Listening Page
+        settings_page = self.stacked_widget.widget(1)
         selected_model = self.combo_box.currentText()
         input_language = self.language_selection.text() or None
 
         listening_page.start_listening(
             selected_model,
-            language=input_language
+            language=input_language,
+            **settings_page.get_settings()
         )
 
         self.stacked_widget.setCurrentIndex(2)
+
+    # Function to switch pages
+    def switch_to_whisper_options(self):
+        """Switch to Advanced Options Page."""
+        self.stacked_widget.setCurrentIndex(1)  # Index of the AdvancedOptionsPage
