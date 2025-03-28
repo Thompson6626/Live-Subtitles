@@ -2,7 +2,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QWidget, QStackedWidget, QLabel, QComboBox, QHBoxLayout,
-    QPushButton, QVBoxLayout, QLineEdit, QSizePolicy
+    QPushButton, QVBoxLayout, QLineEdit, QSizePolicy, QFrame
 )
 
 from .listening import ListeningPage
@@ -23,64 +23,68 @@ class FrontPage(QWidget):
 
         # --- Whisper Model Selection ---
         self.label = QLabel("Whisper Model:")
-        self.label.setFont(QFont("Arial", 16))
+        self.label.setFont(QFont("Arial", 16, QFont.Weight.Bold))
         self.label.setStyleSheet("color: white; margin-left: 15px;")
 
         self.combo_box = QComboBox()
         self.combo_box.addItems(WHISPER_MODELS)
         self.combo_box.setCurrentIndex(6)
         self.combo_box.setFont(QFont("Arial", 14))
-        self.combo_box.setMinimumWidth(180)
+        self.combo_box.setMinimumWidth(200)
         self.combo_box.setStyleSheet("""
             background-color: #333; 
             color: white; 
-            padding: 5px; 
-            border-radius: 5px;
+            padding: 8px; 
+            border-radius: 6px;
         """)
 
-        # Model Selection Layout
         model_selection_layout = QHBoxLayout()
         model_selection_layout.addWidget(self.label)
         model_selection_layout.addWidget(self.combo_box)
         model_selection_layout.addStretch()
 
         # --- Language Selection ---
-        self.language_selection_label = QLabel("Language code:")
-        self.language_selection_label.setFont(QFont("Arial", 13))
+        self.language_selection_label = QLabel("Language Code:")
+        self.language_selection_label.setFont(QFont("Arial", 13, QFont.Weight.Bold))
         self.language_selection_label.setStyleSheet("color: white; margin-left: 15px;")
 
         self.language_selection = QLineEdit()
         self.language_selection.setPlaceholderText("en")
         self.language_selection.setFont(QFont("Arial", 13))
+        self.language_selection.setMinimumWidth(100)
         self.language_selection.setStyleSheet("""
             QLineEdit {
-                border: none;
                 background-color: #444;
                 color: white;
-                padding: 5px;
-                border-radius: 5px;
+                padding: 8px;
+                border-radius: 6px;
+                border: 1px solid #555;
             }
             QLineEdit:focus {
                 border: 1px solid white;
             }
         """)
 
-        # Language Input Layout
         language_input_layout = QHBoxLayout()
         language_input_layout.addWidget(self.language_selection_label)
         language_input_layout.addWidget(self.language_selection)
         language_input_layout.addStretch()
 
+        # --- Divider ---
+        divider = QFrame()
+        divider.setFrameShape(QFrame.Shape.HLine)
+        divider.setStyleSheet("color: #555; margin: 10px 0;")
+
         # --- Buttons ---
-        self.listen_button = QPushButton("Start Listening")
-        self.listen_button.setFont(QFont("Arial", 16))
-        self.listen_button.setMinimumWidth(220)
+        self.listen_button = QPushButton("🎤 Start Listening")
+        self.listen_button.setFont(QFont("Arial", 16, QFont.Weight.Bold))
+        self.listen_button.setMinimumWidth(240)
         self.listen_button.setStyleSheet("""
             QPushButton {
                 background-color: #0078D7; 
-                color: #F5F5F5; 
+                color: white; 
                 padding: 12px; 
-                border-radius: 8px;
+                border-radius: 10px;
                 font-weight: bold;
             }
             QPushButton:hover {
@@ -92,13 +96,13 @@ class FrontPage(QWidget):
         """)
         self.listen_button.clicked.connect(self.open_listening_page)
 
-        self.advanced_options_button = QPushButton("Whisper Settings")
-        self.advanced_options_button.setFont(QFont("Arial", 14))
-        self.advanced_options_button.setMinimumWidth(180)
+        self.advanced_options_button = QPushButton("⚙️ Whisper Settings")
+        self.advanced_options_button.setFont(QFont("Arial", 14, QFont.Weight.Bold))
+        self.advanced_options_button.setMinimumWidth(200)
         self.advanced_options_button.setStyleSheet("""
             QPushButton {
                 background-color: #444;
-                color: #F5F5F5;
+                color: white;
                 padding: 10px;
                 border-radius: 8px;
                 font-weight: bold;
@@ -109,13 +113,13 @@ class FrontPage(QWidget):
         """)
         self.advanced_options_button.clicked.connect(self.switch_to_whisper_options)
 
-        self.listening_style_button = QPushButton("Listening Page Style")
-        self.listening_style_button.setFont(QFont("Arial", 12))
-        self.listening_style_button.setMinimumWidth(180)
+        self.listening_style_button = QPushButton("🎨 Listening Page Style")
+        self.listening_style_button.setFont(QFont("Arial", 12, QFont.Weight.Bold))
+        self.listening_style_button.setMinimumWidth(200)
         self.listening_style_button.setStyleSheet("""
             QPushButton {
                 background-color: #555;
-                color: #F5F5F5;
+                color: white;
                 padding: 10px;
                 border-radius: 8px;
                 font-weight: bold;
@@ -126,7 +130,6 @@ class FrontPage(QWidget):
         """)
         self.listening_style_button.clicked.connect(self.switch_to_listening_style)
 
-        # Buttons Layout
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(self.advanced_options_button)
         buttons_layout.addWidget(self.listening_style_button)
@@ -136,10 +139,11 @@ class FrontPage(QWidget):
         layout = QVBoxLayout()
         layout.addLayout(model_selection_layout)
         layout.addLayout(language_input_layout)
+        layout.addWidget(divider)
         layout.addWidget(self.listen_button, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addLayout(buttons_layout)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(20)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(15)
 
         self.setLayout(layout)
         self.setStyleSheet("background-color: #222;")
