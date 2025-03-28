@@ -158,7 +158,7 @@ class FrontPage(QWidget):
             whisper_settings_page = self.stacked_widget.widget(1)
             listening_settings_page = self.stacked_widget.widget(2)
             selected_model = self.combo_box.currentText()
-            input_language = self.language_selection.text() or None
+            input_language = self.language_selection.text() or None # No empty
 
             self.listening_window = ListeningPage(
                 selected_model,
@@ -177,7 +177,7 @@ class FrontPage(QWidget):
         self.listening_window = None
 
     def switch_to_whisper_options(self):
-        """Switch to Advanced Options Page."""
+        """Switch to Whisper Options Page."""
         self.stacked_widget.setCurrentIndex(1)
 
     def switch_to_listening_style(self):

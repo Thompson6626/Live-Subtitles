@@ -1,7 +1,7 @@
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QWidget, QStackedWidget, QApplication, QVBoxLayout, QSizePolicy
 import sys
-from pages import FrontPage, WhisperSettings, ListeningSettings
+from src.pages import FrontPage, WhisperSettings, ListeningSettings
 
 
 class MyApp(QWidget):

@@ -1,10 +1,10 @@
 from typing import Dict, Union
 
 from PyQt6.QtCore import QTimer, Qt, QPoint, pyqtSignal
-from PyQt6.QtGui import QFont, QMouseEvent, QCursor
+from PyQt6.QtGui import QFont, QMouseEvent
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout
 
-from .transcription import AudioStreamer
+from src.audio import AudioStreamer
 
 
 class ListeningPage(QWidget):

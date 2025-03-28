@@ -35,9 +35,12 @@ Run the application:
 ```sh
 python main.py
 ```
+
 You should see:
 
 ![App Showcase](assets/Showcase.png)
+
+On first listening, the model will take longer to load as it needs to be downloaded. Subsequent runs will be much faster.
 
 ## 📁 Project Structure
 ```
