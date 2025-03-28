@@ -66,11 +66,11 @@ For more information, check the official **FasterWhisper** repository: [SYSTRAN/
 model = WhisperModel("small", device="cpu")
 ```
 ## ✅ TODOs
-- [ ] Implement settings page for more configuration
+- [x] Implement settings page for more configuration
 - [ ] Improve UI design with additional styling
 - [ ] Optimize performance for lower latency and better accuracy
-- [ ] Fix crash when trying to stop listening
-- [ ] Improve listening page so it can be resized and have customizable styling so it can actually work as a subtitle overlay 
+- [x] Fix crash when trying to stop listening
+- [x] Improve listening page so it can be resized and have customizable styling so it can actually work as a subtitle overlay 
 
 ## 📝 License
 This project is licensed under the **MIT License**.
