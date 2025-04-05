@@ -16,7 +16,7 @@ class MyApp(QWidget):
 
         # Create pages
         self.main_page = FrontPage(self.stacked_widget)
-        self.main_page.setFixedSize(500, 300)
+        self.main_page.setFixedSize(520, 350)
 
         self.whisper_settings_page = WhisperSettings(self.stacked_widget)
         self.whisper_settings_page.setMinimumSize(500,300)

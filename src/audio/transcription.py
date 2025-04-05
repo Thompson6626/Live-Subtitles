@@ -7,10 +7,10 @@ SAMPLE_RATE = 16000  # Faster Whisper expects 16 kHz
 CHUNK_SEC = 2  # Reduce latency (1-second chunks)
 MODEL_CACHE = {}  # Cache for loaded models
 
-def get_whisper_model(model_name: str = "medium"):
+def get_whisper_model(model_name: str = "medium", device: str = "cpu"):
     """Load the Faster Whisper model and cache it to avoid reloading."""
     if model_name not in MODEL_CACHE:
-        MODEL_CACHE[model_name] = WhisperModel(model_name, device="cuda", compute_type="float16")
+        MODEL_CACHE[model_name] = WhisperModel(model_name, device, compute_type="float16")
     return MODEL_CACHE[model_name]
 
 class TranscriptionTask(QRunnable):
@@ -57,7 +57,7 @@ class AudioStreamer(QThread):
 
     def __init__(self, model_name: str = "medium", **settings):
         super().__init__()
-        self.model = get_whisper_model(model_name)  # Use cached model
+        self.model = get_whisper_model(model_name, settings.get("device"))  # Use cached model
         self.thread_pool = QThreadPool.globalInstance()
         self.running = True  # Flag for stopping the thread
         self.settings = settings

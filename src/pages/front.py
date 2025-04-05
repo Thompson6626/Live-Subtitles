@@ -14,6 +14,12 @@ WHISPER_MODELS = [
     "distil-small.en", "distil-medium.en", "distil-large-v2", "distil-large-v3"
 ]
 
+DEVICES = [
+    "cpu",
+    "cuda",
+    "auto"
+]
+
 class FrontPage(QWidget):
     """Main page with model selection and start button."""
     def __init__(self, stacked_widget: QStackedWidget):
@@ -41,7 +47,29 @@ class FrontPage(QWidget):
         model_selection_layout = QHBoxLayout()
         model_selection_layout.addWidget(self.label)
         model_selection_layout.addWidget(self.combo_box)
-        model_selection_layout.addStretch()
+        model_selection_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+
+        # --- Device Selection ---
+        self.device_label = QLabel("Device:")
+        self.device_label.setFont(QFont("Arial", 16, QFont.Weight.Medium))
+        self.device_label.setStyleSheet("color: white; margin-left: 13px;")
+
+        self.device_combo_box = QComboBox()
+        self.device_combo_box.addItems(DEVICES)
+        self.device_combo_box.setCurrentIndex(0)
+        self.device_combo_box.setFont(QFont("Arial", 13))
+        self.device_combo_box.setMinimumWidth(200)
+        self.device_combo_box.setStyleSheet("""
+                    background-color: #333; 
+                    color: white; 
+                    padding: 8px; 
+                    border-radius: 6px;
+                """)
+
+        device_selection_layout = QHBoxLayout()
+        device_selection_layout.addWidget(self.device_label)
+        device_selection_layout.addWidget(self.device_combo_box)
+        device_selection_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         # --- Language Selection ---
         self.language_selection_label = QLabel("Language Code:")
@@ -51,12 +79,13 @@ class FrontPage(QWidget):
         self.language_selection = QLineEdit()
         self.language_selection.setPlaceholderText("en")
         self.language_selection.setFont(QFont("Arial", 13))
-        self.language_selection.setMinimumWidth(100)
+        self.language_selection.setMinimumWidth(70)
         self.language_selection.setStyleSheet("""
             QLineEdit {
                 background-color: #444;
                 color: white;
                 padding: 8px;
+                margin-left: 15px;
                 border-radius: 6px;
                 border: 1px solid #555;
             }
@@ -68,7 +97,7 @@ class FrontPage(QWidget):
         language_input_layout = QHBoxLayout()
         language_input_layout.addWidget(self.language_selection_label)
         language_input_layout.addWidget(self.language_selection)
-        language_input_layout.addStretch()
+        language_input_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         # --- Divider ---
         divider = QFrame()
@@ -138,6 +167,7 @@ class FrontPage(QWidget):
         # --- Main Layout ---
         layout = QVBoxLayout()
         layout.addLayout(model_selection_layout)
+        layout.addLayout(device_selection_layout)
         layout.addLayout(language_input_layout)
         layout.addWidget(divider)
         layout.addWidget(self.listen_button, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -159,11 +189,14 @@ class FrontPage(QWidget):
             listening_settings_page = self.stacked_widget.widget(2)
             selected_model = self.combo_box.currentText()
             input_language = self.language_selection.text() or None # No empty
+            device = self.device_combo_box.currentText()
 
             self.listening_window = ListeningPage(
                 selected_model,
                 listening_settings_page.get_settings(),
+
                 language=input_language,
+                device=device,
                 **whisper_settings_page.get_settings()
             )
 
